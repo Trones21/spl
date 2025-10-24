@@ -1,0 +1,31 @@
+# SPL example config (shadow mode, mock feed)
+mode = "shadow"
+exchange = "mock"
+symbol = "SOL-PERP"
+
+[fees]
+bps = 1.0
+
+[latency]
+ms = 100
+
+[slippage]
+bps = 1.5
+
+[risk]
+max_attempts = 3
+max_notional = 150000
+
+[risk.circuit_breaker]
+stops = 3
+minutes = 10
+
+[storage]
+kind = "sqlite"
+dsn = "sqlite:///spl.db"
+
+[strategy]
+kind = "range_bounce_demo"
+range_low = 99.5
+range_high = 100.5
+size = 1.0
