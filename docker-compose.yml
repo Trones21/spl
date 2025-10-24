@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  spl:
+    build:
+      context: .
+      target: runtime   # or 'dev' if you want Poetry in the container
+    container_name: spl-trader
+    command: ["--config", "config/example.shadow.toml"]
+    volumes:
+      - ./config:/app/config:ro
+      - ./src:/app/src:ro
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1

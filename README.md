@@ -178,14 +178,142 @@ if __name__ == "__main__":
 
 ---
 
-## ⚡ Installation
+## ⚡ Environment & Installation (Poetry)
+
+SPL uses **Poetry** for dependency management and reproducibility.
+
+### 1️⃣ Install Poetry
+```bash
+pipx install poetry    # or: pip install poetry
+````
+
+### 2️⃣ Configure local env
 
 ```bash
-pip install -e .
-spl run --config config/drift.shadow.toml
+poetry config virtualenvs.in-project true  # keep .venv inside repo
+poetry env use python3.11
+```
+
+### 3️⃣ Install dependencies
+
+```bash
+poetry install
+```
+
+### 4️⃣ Run SPL
+
+```bash
+poetry run spl --config config/example.shadow.toml
+```
+
+### 5️⃣ Add dependencies later
+
+```bash
+poetry add <package-name>
+poetry add --group dev <package-name>
+```
+
+💡 *Tip:* Commit `poetry.lock` for reproducible builds,
+and use `poetry export -f requirements.txt --output requirements.txt` for Docker/CI images.
+
+---
+
+### 🧱 Development workflow
+
+| Task | Command |
+|------|----------|
+| Activate shell | `poetry shell` |
+| Run CLI | `poetry run spl --config …` |
+| Run tests | `poetry run pytest -v` |
+| Add dependency | `poetry add driftpy` |
+| Export requirements | `poetry export -f requirements.txt -o requirements.txt` |
+
+---
+
+### 🧰 Optional: `.venv` in-project
+
+If you like to see the `.venv` folder under repo root (so IDEs pick it up):
+
+```bash
+poetry config virtualenvs.in-project true
+```
+
+Then you’ll see `.venv/` right beside `src/` — you can safely add it to `.gitignore`.
+
+---
+
+## Docker
+
+
+
+
+## 🐳 Running SPL in Docker
+
+SPL ships with a ready-to-go `Dockerfile` and `docker-compose.yml` for local or server use.
+
+### Build and run (runtime image)
+
+```bash
+docker compose up --build
+````
+
+This builds the lightweight **runtime** image (no Poetry, just the app + deps)
+and launches the engine using your config in `config/example.shadow.toml`.
+
+### Build and run (development mode)
+
+If you want Poetry and dev dependencies available inside the container:
+
+```bash
+docker compose build --target dev
+docker compose run --rm spl --config config/example.shadow.toml
+```
+
+### Notes
+
+* Configs and source are **mounted** from your host, so changes are live.
+* Logs and database (`spl.db`) will persist in the container unless mounted externally.
+* To stop:
+
+  ```bash
+  docker compose down
+  ```
+* To tail logs:
+
+  ```bash
+  docker compose logs -f
+  ```
+
+💡 *Tip:* Adjust the `target:` in `docker-compose.yml` between `runtime` and `dev` depending on whether you want a fast, production-style build or an editable environment with Poetry.
+   - optionally mount your whole repo with `- ./:/app`.
+
+### 🔒 CI snippet
+
+Here’s a quick GitHub Actions block for testing:
+
+```yaml
+- uses: actions/setup-python@v5
+  with:
+    python-version: "3.11"
+- uses: snok/install-poetry@v1
+- run: poetry install --no-interaction
+- run: poetry run pytest -v
 ```
 
 ---
+
+### 🚀 Next steps
+
+1. **Run `poetry install`** in repo root — it’ll build `.venv` automatically.
+2. **Verify**: `poetry run spl --config config/example.shadow.toml`
+3. Add `driftpy` and `hyperliquid-python-sdk` next with:
+
+   ```bash
+   poetry add driftpy hyperliquid-python-sdk
+   ```
+4. Publish it to PyPI with `poetry publish --build`.
+
+
 
 ## 📜 License
 

@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "spl-trader"
+version = "0.1.0"
+description = "SPL — Shadow - Paper - Live execution engine"
+readme = "README.md"
+license = "MIT"
+keywords = ["trading", "paper-trading", "shadow-execution", "solana"]
+packages = [{ include = "spl", from = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+click = "^8.1.7"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.0"
+
+[tool.poetry.scripts]
+spl = "spl.cli.main:run"
+
+[build-system]
+requires = ["poetry-core>=1.9.0"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,24 @@
+# vcs / editor
+.git
+.gitignore
+.github
+.vscode
+.idea
+
+# python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.mypy_cache/
+.pytest_cache/
+
+# local env / build
+.venv/
+dist/
+build/
+
+# data / app state
+*.db
+*.sqlite
