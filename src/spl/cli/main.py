@@ -23,7 +23,8 @@ from spl.cli.helpers import (
     validate_config,
     validate_strategy,
     validate_market,
-    diagnostics_summary
+    diagnostics_summary,
+    check_storage_health
 )
 
 
@@ -33,14 +34,14 @@ from spl.cli.helpers import (
 def run(config, observe):
     cfg = tomllib.load(Path(config).open("rb"))
 
-    # ---- Pre-validate config
+    # Pre-validate config
     validate_config(cfg)
 
-    mode = cfg.get("mode", "shadow")
-    exchange = cfg.get("exchange", "mock")
-    symbol = cfg.get("symbol", "SOL-PERP")
+    mode = cfg.get("mode")
+    exchange = cfg.get("exchange")
+    symbol = cfg.get("symbol")
 
-    # 1) Market adapter
+    # Market adapter
     if exchange == "mock":
         market = MockMarket(cfg)
     if exchange == "hyperliquid":
@@ -49,8 +50,13 @@ def run(config, observe):
         raise NotImplementedError(f"Exchange adapter not wired: {exchange}")
 
 
-    # 2) Exec backend
+   # Storage
+    store_cfg = cfg.get("storage", {})
+    check_storage_health(cfg)
     store = SQLiteStore(cfg)
+    
+    
+    # Exec backend
     if mode == "shadow":
         exec_backend = ShadowBackend(store, fee_bps=cfg["fees"]["bps"])
     elif mode == "paper":
@@ -59,11 +65,11 @@ def run(config, observe):
     else:
         raise NotImplementedError("Live backend not wired in demo scaffold.")
 
-    # 3) Risk
+    # Risk
     # risk = BasicRisk(cfg["risk"])
     risk = AllowAllRisk()
 
-    # 4) Strategy
+    # Strategy
     strat_kind = cfg.get("strategy", {}).get("kind", "range_bounce_demo")
     if strat_kind == "range_bounce_demo":
         strategy = RangeBounce(cfg)
@@ -94,7 +100,9 @@ def run(config, observe):
     # Engine
     eng = Engine(market, exec_backend, store, risk)
     click.echo(f"[SPL] Running mode={mode} exchange={exchange} symbol={symbol}")
-    eng.run(symbol, strategy, observe=observe)
+
+    # Pylance complains here because symbol: str | None, but validate_config takes care of this check for us
+    eng.run(symbol, strategy, observe=observe) # type: ignore[arg-type]
 
 if __name__ == "__main__":
     run()

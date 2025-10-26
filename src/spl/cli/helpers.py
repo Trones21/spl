@@ -42,10 +42,24 @@ def validate_config(cfg: Mapping[str, Any]) -> None:
         if net not in ("mainnet", "testnet"):
             fail("hyperliquid.network must be 'mainnet' or 'testnet'")
 
-    db = cfg.get("storage", {}).get("path", "spl.db")
-    parent = Path(db).resolve().parent
+    # Storage path must exist or be creatable
+    storage_cfg = cfg.get("storage", {})
+    db_path = storage_cfg.get("path")
+
+    if not db_path:
+        # Explicit warning instead of silent default
+        click.secho("[WARN] No [storage].path specified in config; using default 'spl.db' in repo root.", fg="yellow")
+        db_path = "spl.db"
+        cfg.setdefault("storage", {})["path"] = db_path  # write back into cfg for later use
+
+    resolved_path = Path(db_path).expanduser().resolve()
+    parent = resolved_path.parent
+
     if not os.access(parent, os.W_OK):
-        fail(f"Storage path not writeable: {parent}")
+        raise click.ClickException(f"Storage path not writeable: {parent}")
+
+    # Print where we’ll write
+    click.secho(f"[STORE] Using database at: {resolved_path}", fg="cyan")
 
 
 def validate_strategy(strategy) -> None:
@@ -59,6 +73,23 @@ def validate_market(market) -> None:
     for fn in ("subscribe_quotes", "subscribe_trades"):
         if not hasattr(market, fn):
             fail(f"Market adapter missing required method: {fn}")
+
+
+def check_storage_health(cfg):
+    """Ensure SQLite storage path is writable and file can be created."""
+    db_path = Path(cfg.get("storage", {}).get("path", "spl.db")).expanduser().resolve()
+    parent = db_path.parent
+
+    # Ensure parent exists
+    parent.mkdir(parents=True, exist_ok=True)
+
+    try:
+        # Try touching the file
+        with open(db_path, "a"):
+            pass
+        click.secho(f"[STORE] OK: writable at {db_path}", fg="cyan")
+    except Exception as e:
+        raise click.ClickException(f"[STORE] Cannot write to {db_path}: {e}")
 
 
 # ----------------------- #
@@ -77,7 +108,7 @@ def diagnostics_summary(
 ) -> None:
     """Prints a concise, colorized overview of the run context."""
     click.secho("\n╔════════════════════════════════════════╗", fg="cyan")
-    click.secho("║         SPL Pre-Run Diagnostics         ║", fg="cyan", bold=True)
+    click.secho("║         SPL Pre-Run Diagnostics        ║", fg="cyan", bold=True)
     click.secho("╚════════════════════════════════════════╝", fg="cyan")
 
     click.secho(f" Mode:       {cfg.get('mode', '???')}", fg="green")
@@ -89,6 +120,11 @@ def diagnostics_summary(
     click.secho(f" Symbol:     {cfg.get('symbol', '???')}", fg="green")
     click.secho(f" Observe:    {'Yes' if observe else 'No'}", fg="green")
 
+    # --- Storage info ---
+    db_path = Path(cfg.get("storage", {}).get("path", "spl.db")).expanduser().resolve()
+    click.secho(f" Storage DB: {db_path}", fg="blue")
+    
+    click.secho(f"")
     # Component health indicators
     ok = lambda name: click.style("✅", fg="green") + f" {name}"
     warn = lambda name: click.style("⚠️ ", fg="yellow") + f" {name}"

@@ -118,13 +118,14 @@ minutes = 10
 [storage]
 kind = "sqlite"
 dsn = "sqlite:///spl.db"
+path = "spl.db"
 ```
 ---
 
 ## 🖥️ CLI
 
 ```bash
-spl run --config config/drift.shadow.toml
+poetry spl run --config config/drift.shadow.toml
 ```
 
 ### Example Python Entry
@@ -194,8 +195,6 @@ poetry env use python3.11
 
 ```
 
-
-
 ### 3️⃣ Install dependencies
 
 ```bash
@@ -247,9 +246,6 @@ Then you’ll see `.venv/` right beside `src/` — you can safely add it to `.gi
 ---
 
 ## Docker
-
-
-
 
 ## 🐳 Running SPL in Docker
 
@@ -305,19 +301,6 @@ Here’s a quick GitHub Actions block for testing:
 ```
 
 ---
-
-### 🚀 Next steps
-
-1. **Run `poetry install`** in repo root — it’ll build `.venv` automatically.
-2. **Verify**: `poetry run spl --config config/example.shadow.toml`
-3. Add `driftpy` and `hyperliquid-python-sdk` next with:
-
-   ```bash
-   poetry add driftpy hyperliquid-python-sdk
-   ```
-4. Publish it to PyPI with `poetry publish --build`.
-
-
 
 ## 📜 License
 

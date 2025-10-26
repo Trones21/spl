@@ -1,7 +1,7 @@
 # SPL example config (shadow mode, mock feed)
 mode = "paper"
 exchange = "hyperliquid"
-symbol = "SOL-PERP"
+# symbol = "SOL-PERP"
 
 [hyperliquid]
 network = "mainnet"
@@ -29,6 +29,7 @@ minutes = 10
 [storage]
 kind = "sqlite"
 dsn = "sqlite:///spl.db"
+path = "spl.db"
 
 [strategy]
 kind = "demo_market_tick"

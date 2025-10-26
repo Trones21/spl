@@ -17,7 +17,7 @@ class SQLiteStore:
             ts INTEGER, kind TEXT, payload TEXT
         )""")
         self.conn.commit()
-
+    
     def write_fill(self, f: Fill):
         self.conn.execute(
             "INSERT INTO fills(ts, client_id, symbol, side, px, sz, fee) VALUES (?,?,?,?,?,?,?)",
