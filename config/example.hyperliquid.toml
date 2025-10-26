@@ -1,0 +1,37 @@
+# SPL example config (shadow mode, mock feed)
+mode = "paper"
+exchange = "hyperliquid"
+symbol = "SOL-PERP"
+
+[hyperliquid]
+network = "mainnet"
+# DO NOT hardcode secrets; read from env at runtime
+account_address = "0xYOURMAINWALLET"
+secret_key_env = "HL_SECRET_KEY"
+
+[fees]
+bps = 1.0
+
+[latency]
+ms = 100
+
+[slippage]
+bps = 1.5
+
+[risk]
+max_attempts = 3
+max_notional = 150000
+
+[risk.circuit_breaker]
+stops = 3
+minutes = 10
+
+[storage]
+kind = "sqlite"
+dsn = "sqlite:///spl.db"
+
+[strategy]
+kind = "demo_market_tick"
+range_low = 99.5
+range_high = 100.5
+size = 1.0

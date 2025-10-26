@@ -16,6 +16,7 @@ class RangeBounce:
         self.symbol = cfg.get("symbol", "SOL-PERP")
 
     def on_event(self, event):
+
         # Works with Quote or Trade (both have price info one way or another)
         price = getattr(event, "price", None)
         if price is None:

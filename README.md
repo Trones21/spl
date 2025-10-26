@@ -7,8 +7,6 @@
 
 ## 🌐 Overview
 
-Note that this is current just the very beginning, still in the POC / buildout phase.
-
 **SPL (Shadow · Paper · Live)** is a pluggable execution engine for running your trade strategies in three tiers:
 
 | Mode       | Description                                         | Market Impact |
@@ -192,11 +190,17 @@ pipx install poetry    # or: pip install poetry
 ```bash
 poetry config virtualenvs.in-project true  # keep .venv inside repo
 poetry env use python3.11
+
+
 ```
+
+
 
 ### 3️⃣ Install dependencies
 
 ```bash
+# install hangs on keyring on Ubuntu 25.10 
+poetry config keyring.enabled false
 poetry install
 ```
 

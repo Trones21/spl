@@ -18,7 +18,7 @@ class MockMarket:
             bid = round(self._p - 0.01, 4)
             ask = round(self._p + 0.01, 4)
             yield Quote(ts=int(time.time()*1000), bid=bid, ask=ask, bid_sz=5.0, ask_sz=5.0)
-            time.sleep(0.05)
+            time.sleep(1)
 
     def subscribe_trades(self, symbol: str) -> Iterable[Trade]:
         while True:
