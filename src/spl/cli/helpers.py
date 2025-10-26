@@ -2,7 +2,7 @@ import os
 import click
 from pathlib import Path
 from typing import Any, Mapping
-
+from importlib.metadata import entry_points
 
 # ----------------------- #
 #   VALIDATION HELPERS    #
@@ -107,6 +107,11 @@ def diagnostics_summary(
     observe: bool = False,
 ) -> None:
     """Prints a concise, colorized overview of the run context."""
+    
+    eps = entry_points(group="spl.adapters")
+    names = ", ".join(sorted(ep.name for ep in eps))
+    print(f"[ADAPTERS] installed: {names or 'none'}")
+     
     click.secho("\n╔════════════════════════════════════════╗", fg="cyan")
     click.secho("║         SPL Pre-Run Diagnostics        ║", fg="cyan", bold=True)
     click.secho("╚════════════════════════════════════════╝", fg="cyan")

@@ -5,7 +5,7 @@ import anyio
 import websockets
 import orjson
 
-from ..core.types import Quote, Trade, Side
+from spl.core.types import Quote, Trade, Side
 
 HL_MAINNET_WS = "wss://api.hyperliquid.xyz/ws"
 HL_TESTNET_WS = "wss://api.hyperliquid-testnet.xyz/ws"

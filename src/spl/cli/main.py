@@ -1,8 +1,8 @@
 import click, tomllib
 from pathlib import Path
 
+from spl.cli.resolve import resolve_market
 from spl.adapters.mock import MockMarket
-from spl.adapters.hyperliquid import HyperliquidMarket
 
 from spl.exec.backend_shadow import ShadowBackend
 from spl.exec.backend_paper import PaperBackend
@@ -52,7 +52,7 @@ def run(config, observe):
 
    # Storage
     store_cfg = cfg.get("storage", {})
-    check_storage_health(cfg)
+    check_storage_health(store_cfg)
     store = SQLiteStore(cfg)
     
     

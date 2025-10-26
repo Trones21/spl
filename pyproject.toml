@@ -10,10 +10,7 @@ packages = [{ include = "spl", from = "src" }]
 [tool.poetry.dependencies]
 python = "^3.11"
 click = "^8.1.7"
-hyperliquid-python-sdk = "^0.20.0"
-websockets = "^15.0.1"
 anyio = "^4.11.0"
-backoff = "^2.2.1"
 orjson = "^3.11.4"
 
 [tool.poetry.group.dev.dependencies]
@@ -21,6 +18,7 @@ pytest = "^8.2.0"
 
 [tool.poetry.scripts]
 spl = "spl.cli.main:run"
+spl-list-adapters = "spl.cli.list_adapters:list_adapters"
 
 [build-system]
 requires = ["poetry-core>=1.9.0"]
