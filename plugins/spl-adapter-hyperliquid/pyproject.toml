@@ -5,10 +5,12 @@ description = "SPL adapter: Hyperliquid"
 packages = [{ include = "spl_adapter_hyperliquid", from = "src" }]
 
 [tool.poetry.dependencies]
+spl-trader = { path = "../../", develop = true }
 python = "^3.11"
 websockets = ">=15,<16"
 anyio = "^4"
 orjson = "^3.9"
+
 
 [tool.poetry.plugins."spl.adapters"]
 hyperliquid = "spl_adapter_hyperliquid.adapter:HyperliquidMarket"

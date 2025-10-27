@@ -1,0 +1,19 @@
+mode = "live"
+exchange = "drift"
+symbol = "SOL-PERP"
+
+[drift]
+network = "mainnet"
+rpc_url = "https://your-solana-rpc/"
+keypair_path = "/path/to/id.json"
+
+[storage]
+kind = "sqlite"
+dsn = "sqlite:///spl.db"
+path = "spl.db"
+
+[strategy]
+kind = "demo_market_tick"
+range_low = 99.5
+range_high = 100.5
+size = 1.0

@@ -2,7 +2,7 @@
 
 SPL uses **Poetry** for dependency management and reproducible builds.
 
-### 1️⃣ Install Poetry
+### 1️⃣ Install Poetry (if not already installed)
 
 ```bash
 pipx install poetry
@@ -68,16 +68,20 @@ This installs:
 
 ## 🧱 Typical Usage
 
+Note: We need to be in the correct plugin folder to use the correct venv. This unfortunately means that traversing to get our config file is a bit ugly. (Later i could rewrite this so that it searches the config folder for the name... but thats just a quality of life thing...)
+
 ### Example: Hyperliquid paper mode
 
 ```bash
-poetry run spl --config config/example.hyperliquid.toml
+cd plugins/spl-adapter-hyperliquid
+poetry run spl --config ../../config/example.hyperliquid.toml
 ```
 
 ### Example: Drift paper mode
 
 ```bash
-poetry run spl --config config/example.drift.toml
+cd plugins/spl-adapter-drift
+poetry run spl --config ../../config/example.drift.toml
 ```
 
 You’ll see a pre-run diagnostics summary:
@@ -87,23 +91,6 @@ You’ll see a pre-run diagnostics summary:
 [ADAPTERS] installed: hyperliquid
 [SPL] Running mode=paper exchange=hyperliquid symbol=SOL-PERP
 ```
-
----
-
-## 🧰 Dev Workflow Tips
-
-* Use `poetry shell` to activate the environment interactively.
-* For multi-adapter work, keep separate environments:
-
-  ```bash
-  poetry env use python3.11  # HL env
-  poetry env use python3.11  # Drift env (in another venv folder)
-  ```
-* To see installed adapters:
-
-  ```bash
-  poetry run python -m spl.cli.list_adapters
-  ```
 
 ---
 

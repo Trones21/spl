@@ -67,20 +67,20 @@ cd plugins/spl-adapter-hyperliquid
 poetry env use python3.11
 poetry install
 # also install core (the CLI) into the same env
-poetry run pip install -e ../../spl-trader
+poetry run pip install -e ../../spl
 # run HL tests
 poetry run pytest -v -m integration
 # run core tests (from this env) if you want
-poetry run pytest -v -k "not drift" ../../spl-trader/tests
+poetry run pytest -v -k "not drift" ../../spl/tests
 deactivate  # if you used 'poetry shell'
 
 # 2) Core + Drift env
 cd ../spl-adapter-drift
 poetry env use python3.11
 poetry install
-poetry run pip install -e ../../spl-trader
+poetry run pip install -e ../../spl
 poetry run pytest -v -m integration
-poetry run pytest -v -k "not hyperliquid" ../../spl-trader/tests
+poetry run pytest -v -k "not hyperliquid" ../../spl/tests
 ```
 
 > Tip: `poetry shell` gives you an interactive shell in the env; use `exit` to leave it.

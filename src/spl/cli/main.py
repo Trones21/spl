@@ -2,7 +2,7 @@ import click, tomllib
 from pathlib import Path
 
 from spl.cli.resolve import resolve_market
-from spl.adapters.mock import MockMarket
+from spl.mock_adapter.mock import MockMarket
 
 from spl.exec.backend_shadow import ShadowBackend
 from spl.exec.backend_paper import PaperBackend
@@ -44,8 +44,10 @@ def run(config, observe):
     # Market adapter
     if exchange == "mock":
         market = MockMarket(cfg)
-    if exchange == "hyperliquid":
-        market = HyperliquidMarket(cfg.get("hyperliquid", {}))
+    elif exchange == "hyperliquid":
+        market = resolve_market(exchange, cfg)
+    elif exchange == "drift":
+        market = resolve_market(exchange, cfg)
     else:
         raise NotImplementedError(f"Exchange adapter not wired: {exchange}")
 
