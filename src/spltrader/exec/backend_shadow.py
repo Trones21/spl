@@ -1,41 +1,58 @@
-from typing import Iterable, Dict
-from ..core.types import OrderReq, Quote, Trade, Fill, AccountSnapshot
-from ..core.types import OrdType
-from ..core.utils import fee_from_bps
-from ..engine.fill_shadow import trade_crosses_limit
+# spl/exec/backend_shadow.py
 import time
+from typing import Iterable, Dict
+from ..core.interfaces import IExecutionBackend
+from ..core.types import Quote, Trade, OrderReq, Fill, AccountSnapshot, Side, OrdType
 
-class ShadowBackend:
-    def __init__(self, store, fee_bps: float = 1.0):
-        self.store = store
-        self.fee_bps = fee_bps
-        self._orders: Dict[str, OrderReq] = {}
-        self._fills: list[Fill] = []
+class ShadowBackend(IExecutionBackend):
+    def __init__(self, fee_bps: float = 0.0):
+        self.fee = fee_bps / 10_000.0
+        self.resting: Dict[str, OrderReq] = {}   # orders we “would” have sent
+        self.positions: Dict[str, Dict[str, float]] = {}
+        self.cash = 0.0
 
     def place(self, req: OrderReq) -> str:
-        self._orders[req.client_id] = req
-        self.store.write_event("place", req.__dict__)
+        # store intent; do not send
+        self.resting[req.client_id] = req
         return req.client_id
 
     def cancel(self, client_order_id: str) -> bool:
-        ok = self._orders.pop(client_order_id, None) is not None
-        if ok: self.store.write_event("cancel", {"client_id": client_order_id})
-        return ok
+        return self.resting.pop(client_order_id, None) is not None
 
     def on_quote(self, q: Quote) -> Iterable[Fill]:
-        return []  # shadow uses trades for filling
+        # shadow doesn’t fill from quotes
+        return []
 
     def on_trade(self, t: Trade) -> Iterable[Fill]:
         fills = []
-        for cid, o in list(self._orders.items()):
-            if o.type == OrdType.LIMIT and o.px is not None and trade_crosses_limit(o.side, o.px, t.price):
-                # simple full-fill model; you can extend to partials using t.size
-                fee = fee_from_bps(t.price * o.sz, self.fee_bps)
-                f = Fill(ts=t.ts, client_id=cid, symbol=o.symbol, side=o.side, px=t.price, sz=o.sz, fee=fee)
-                fills.append(f)
-                self._fills.append(f)
-                self._orders.pop(cid, None)
+        for cid, req in list(self.resting.items()):
+            if req.symbol != req.symbol:
+                continue
+            # MARKET orders: treat first trade after placement as fill
+            if req.type == OrdType.MARKET:
+                px = t.price
+                fee = abs(req.sz) * px * self.fee
+                base = req.sz if req.side == Side.BUY else -req.sz
+                pos = self.positions.setdefault(req.symbol, {"base": 0.0, "pnl_real": 0.0})
+                pos["pnl_real"] -= base * px
+                pos["base"] += base
+                self.cash -= fee
+                fills.append(Fill(ts=t.ts, client_id=cid, symbol=req.symbol, side=req.side, px=px, sz=req.sz, fee=fee))
+                self.resting.pop(cid)
+            # LIMIT: fill if trade price crosses our limit in the right direction
+            elif req.type == OrdType.LIMIT and req.px is not None:
+                if (req.side == Side.BUY and t.price <= req.px) or (req.side == Side.SELL and t.price >= req.px):
+                    px = t.price
+                    fee = abs(req.sz) * px * self.fee
+                    base = req.sz if req.side == Side.BUY else -req.sz
+                    pos = self.positions.setdefault(req.symbol, {"base": 0.0, "pnl_real": 0.0})
+                    pos["pnl_real"] -= base * px
+                    pos["base"] += base
+                    self.cash -= fee
+                    fills.append(Fill(ts=t.ts, client_id=cid, symbol=req.symbol, side=req.side, px=px, sz=req.sz, fee=fee))
+                    self.resting.pop(cid)
         return fills
 
     def snapshot(self) -> AccountSnapshot:
-        return AccountSnapshot(ts=int(time.time()*1000), balance=0.0, positions={})
+        ts = int(time.time()*1000)
+        return AccountSnapshot(ts=ts, balance=self.cash, positions=self.positions)

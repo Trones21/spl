@@ -37,20 +37,14 @@ def run(config, observe):
     # Pre-validate config
     validate_config(cfg)
 
-    mode = cfg.get("mode")
-    exchange = cfg.get("exchange")
-    symbol = cfg.get("symbol")
-
     # Market adapter
-    if exchange == "mock":
-        market = MockMarket(cfg)
-    elif exchange == "hyperliquid":
-        market = resolve_market(exchange, cfg)
-    elif exchange == "drift":
-        market = resolve_market(exchange, cfg)
-    else:
-        raise NotImplementedError(f"Exchange adapter not wired: {exchange}")
-
+    adapter = resolve_market(cfg["exchange"], cfg)
+    if observe:
+        # data-only; do not start Engine/strategy
+        md = adapter.market_data()
+        for q in md.subscribe_quotes(cfg["symbol"]):
+            print(q)
+        return
 
    # Storage
     store_cfg = cfg.get("storage", {})
@@ -59,13 +53,16 @@ def run(config, observe):
     
     
     # Exec backend
-    if mode == "shadow":
-        exec_backend = ShadowBackend(store, fee_bps=cfg["fees"]["bps"])
-    elif mode == "paper":
-        exec_backend = PaperBackend(store, fee_bps=cfg["fees"]["bps"],
-                                    slippage_bps=cfg["slippage"]["bps"])
+    # strategy runs for the 3 execution modes
+    mode = cfg.get("mode", "paper")
+    if mode == "paper":
+        backend = PaperBackend(store=store, slippage_bps=cfg.get("paper", {}).get("slippage_bps", 1.0))
+    elif mode == "shadow":
+        backend = ShadowBackend(store=store)
+    elif mode == "live":
+        backend = adapter.execution_live()  # from your Drift adapter
     else:
-        raise NotImplementedError("Live backend not wired in demo scaffold.")
+        raise ValueError(f"unknown mode: {mode}")
 
     # Risk
     # risk = BasicRisk(cfg["risk"])

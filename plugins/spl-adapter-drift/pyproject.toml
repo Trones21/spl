@@ -10,6 +10,7 @@ python = "^3.11"
 anyio = "^4"
 orjson = "^3.9"
 spl-trader = {path = "../../", develop = true}
+httpx = "^0.28.1"
 
 [tool.poetry.plugins."spltrader.adapters"]
 drift = "spl_adapter_drift.adapter:DriftMarket"

@@ -12,5 +12,8 @@ def resolve_market(exchange: str, cfg: dict):
             "  pip install -e plugins/spl-adapter-hyperliquid\n"
             "  pip install -e plugins/spl-adapter-drift"
         )
+
+    # build merged config
+    merged = {**cfg, **cfg.get(exchange, {})}
     Market = reg[exchange].load()
-    return Market(cfg.get(exchange, {}))
+    return Market(merged)

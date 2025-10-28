@@ -4,40 +4,64 @@ from dataclasses import dataclass
 from typing import Iterable
 from driftpy.drift_client import DriftClient
 from driftpy.account_subscription_config import AccountSubscriptionConfig
+from driftpy.accounts.bulk_account_loader import BulkAccountLoader
 from driftpy.constants.numeric_constants import PRICE_PRECISION
 from driftpy.types import MarketType
 from anchorpy.provider import Wallet
 from solana.rpc.async_api import AsyncClient
+from solana.rpc.commitment import Confirmed
 from solders.keypair import Keypair
 from solders.pubkey import Pubkey
+from driftpy.constants.config import configs
+
+import click
 
 from spltrader.core.types import Quote, Trade, Side
 
-@dataclass(frozen=True)
+@dataclass()
 class DriftMarket:
     """
     Drift Market adapter matching Engine expectations.
     Uses polling for quotes (no WebSocket subscription flood).
     """
     cfg: dict
-
+    
     def __post_init__(self):
+        print("config", self.cfg)
+        
         key_path = self.cfg["wallet"]["keypair_path"]
-        rpc_url = self.cfg["rpc"]["url"]
+        if not key_path:
+            raise click.ClickException("Missing wallet.keypair_path in config")
+        
         sub_account_id = self.cfg.get("sub_account_id", 0)
 
-        kp = Keypair.from_bytes(bytes(open(key_path, "rb").read()))
+        with open(key_path, "r") as f:
+            data = f.read()
+        kp = Keypair.from_base58_string(data)
+
         wallet = Wallet(kp)
-        conn = AsyncClient(rpc_url)
+        rpc_url = self.cfg["urls"]["rpc_url"]
+        ws_url = self.cfg["urls"]["ws_url"]
+        
+        conn = AsyncClient(rpc_url, commitment=Confirmed)
+
+        # bulk_acc_loader = BulkAccountLoader(conn) #for polling... but currently error with rpc response parsing
+        subs_config = AccountSubscriptionConfig("websocket")
+
+        cfgm = configs["mainnet"]  # "mainnet" or "devnet"
+        mkt = cfgm.perp_markets[0]
+        print("oracle_pk", mkt.oracle)
 
         self.dc = DriftClient(
             conn,
             wallet,
             "mainnet",
-            account_subscription=AccountSubscriptionConfig("polling"),
+            account_subscription=subs_config,
             active_sub_account_id=sub_account_id,
+            perp_market_indexes=[0,1],
+            spot_market_indexes=[0,1]
         )
-
+        print("dc setup")
         # Use explicit event loop for async ops
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
@@ -48,6 +72,7 @@ class DriftMarket:
         """Yield best bid/ask quotes periodically."""
         market_index = self._resolve_market_index(symbol)
         while True:
+            print("getting prices")
             px_data = self.dc.get_oracle_price_data_for_perp_market(market_index)
             if not px_data:
                 time.sleep(1)
