@@ -1,23 +1,23 @@
 import click, tomllib
 from pathlib import Path
 
-from spl.cli.resolve import resolve_market
-from spl.mock_adapter.mock import MockMarket
+from spltrader.cli.resolve import resolve_market
+from spltrader.mock_adapter.mock import MockMarket
 
-from spl.exec.backend_shadow import ShadowBackend
-from spl.exec.backend_paper import PaperBackend
+from spltrader.exec.backend_shadow import ShadowBackend
+from spltrader.exec.backend_paper import PaperBackend
 
-from spl.storage.sqlite_store import SQLiteStore
+from spltrader.storage.sqlite_store import SQLiteStore
 
-from spl.risk.basic import BasicRisk
-from spl.risk.allow_all import AllowAllRisk
+from spltrader.risk.basic import BasicRisk
+from spltrader.risk.allow_all import AllowAllRisk
 
-from spl.engine.engine import Engine
+from spltrader.engine.engine import Engine
 
-from spl.strategies.demo_market_tick import DemoMarketTick
-from spl.strategies.demo import RangeBounce
+from spltrader.strategies.demo_market_tick import DemoMarketTick
+from spltrader.strategies.demo import RangeBounce
 
-from spl.cli.helpers import (
+from spltrader.cli.helpers import (
     fail,
     ensure_instance,
     validate_config,

@@ -5,7 +5,7 @@ import queue
 import threading
 import pytest
 
-from spl.adapters.hyperliquid import HyperliquidMarket
+from spltrader.adapters.hyperliquid import HyperliquidMarket
 
 @pytest.mark.integration
 def test_hyperliquid_quotes_and_trades_smoke():

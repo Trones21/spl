@@ -5,7 +5,7 @@ description = "SPL — Shadow - Paper - Live execution engine"
 readme = "README.md"
 license = "MIT"
 keywords = ["trading", "paper-trading", "shadow-execution", "solana"]
-packages = [{ include = "spl", from = "src" }]
+packages = [{ include = "spltrader", from = "src" }]
 
 
 [tool.poetry.dependencies]
@@ -17,8 +17,10 @@ orjson = "^3.11.4"
 pytest = "^8.2.0"
 
 [tool.poetry.scripts]
-spl = "spl.cli.main:run"
-spl-list-adapters = "spl.cli.list_adapters:list_adapters"
+# keeping old (spl) entrypoint for convenience
+spl = "spltrader.cli.main:run"
+spltrader = "spltrader.cli.main:run"
+spl-list-adapters = "spltrader.cli.list_adapters:list_adapters"
 
 [build-system]
 requires = ["poetry-core>=1.9.0"]

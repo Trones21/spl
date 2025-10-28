@@ -91,14 +91,14 @@ spl-trader/
 ```
 ┌──────────────┐        ┌──────────────────────────┐
 │   CLI (spl)  │        │     Config (TOML)        │
-│ spl.cli.main │◄──────►│ mode/exchange/symbol/... │
+│ spltrader.cli.main │◄──────►│ mode/exchange/symbol/... │
 └──────┬───────┘        └──────────────────────────┘
        │
        │ resolve_market(exchange, cfg)
        ▼
 ┌───────────────────────────────┐      Entry points (installed plugins)
-│  Adapter Resolver             │─────► group="spl.adapters"
-│  spl.cli.resolve              │      e.g. "hyperliquid" → HyperliquidMarket
+│  Adapter Resolver             │─────► group="spltrader.adapters"
+│  spltrader.cli.resolve              │      e.g. "hyperliquid" → HyperliquidMarket
 └──────────────┬────────────────┘
                │ MarketClass = ep.load()
                ▼
@@ -112,7 +112,7 @@ spl-trader/
               ▼
 ┌────────────────────────────────────────────────────────────────┐
 │                           Engine                               │
-│                        spl.engine.engine                       │
+│                        spltrader.engine.engine                 │
 │                                                                │
 │  while True:                                                   │
 │    q = next(quotes)                                            │
@@ -131,7 +131,7 @@ spl-trader/
               │                        │                 │
      ┌────────┴───────┐       ┌────────┴──────┐  ┌──────┴──────────┐
      │  Strategy      │       │ Exec Backend  │  │   Store          │
-     │  spl.strategies│       │ spl.exec.*    │  │ spl.storage.*    │
+     │ spltrader.strategies│  │ spltrader.exec.* │  │ spltrader.storage.*    │
      │ on_event(evt)  │       │ paper/shadow  │  │ (sqlite/parquet) │
      │ → [OrderReq...]│       │ place()/fills │  │ write_fill/event │
      └────────────────┘       └───────────────┘  └──────────────────┘
@@ -140,7 +140,7 @@ spl-trader/
               │
         ┌─────┴─────┐
         │   Risk     │
-        │ spl.risk.* │
+        │ spltrader.risk.* │
         └────────────┘
 ```
 

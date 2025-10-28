@@ -1,6 +1,6 @@
 import threading, queue, time, anyio, websockets, orjson
 from typing import Iterable
-from spl.core.types import Quote, Trade, Side
+from spltrader.core.types import Quote, Trade, Side
 
 DLOB_MAIN = "wss://dlob.drift.trade/ws"
 DLOB_DEV  = "wss://master.dlob.drift.trade/ws"

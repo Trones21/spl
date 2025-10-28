@@ -3,7 +3,7 @@ import click
 from importlib.metadata import entry_points
 
 def resolve_market(exchange: str, cfg: dict):
-    eps = entry_points(group="spl.adapters")
+    eps = entry_points(group="spltrader.adapters")
     reg = {ep.name: ep for ep in eps}
     if exchange not in reg:
         raise click.ClickException(

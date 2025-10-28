@@ -11,7 +11,7 @@ from solana.rpc.async_api import AsyncClient
 from solders.keypair import Keypair
 from solders.pubkey import Pubkey
 
-from spl.core.types import Quote, Trade, Side
+from spltrader.core.types import Quote, Trade, Side
 
 @dataclass(frozen=True)
 class DriftMarket:

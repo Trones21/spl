@@ -11,5 +11,5 @@ anyio = "^4"
 orjson = "^3.9"
 spl-trader = {path = "../../", develop = true}
 
-[tool.poetry.plugins."spl.adapters"]
+[tool.poetry.plugins."spltrader.adapters"]
 drift = "spl_adapter_drift.adapter:DriftMarket"
