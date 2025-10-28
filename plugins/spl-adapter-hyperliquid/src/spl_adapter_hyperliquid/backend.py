@@ -1,6 +1,7 @@
 # spl/exec/backend_hyperliquid.py
 import time
 from spl.core.types import OrderReq, Fill  # whatever your types are
+from hyperliquid import exchange
 
 class HyperliquidExec:
     def __init__(self, cfg, store):
@@ -10,10 +11,10 @@ class HyperliquidExec:
           account_address: "0x..."    # main wallet address
           secret_key: "..."           # API wallet private key (keep in env!)
         """
-        from hyperliquid import Hyperliquid  # from official SDK or ccxt-hyperliquid
+          # from official SDK or ccxt-hyperliquid
         self.cfg = cfg
         self.store = store
-        self.hl = Hyperliquid({
+        self.hl = exchange.Exchange({
             "network": cfg.get("network","mainnet"),
             "account_address": cfg["account_address"],
             "secret_key": cfg["secret_key"],

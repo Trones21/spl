@@ -5,6 +5,7 @@ __pycache__/
 *.db
 .env
 .venv
+.config
 dist/
 build/
 *.egg-info/

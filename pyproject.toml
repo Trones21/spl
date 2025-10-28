@@ -7,9 +7,10 @@ license = "MIT"
 keywords = ["trading", "paper-trading", "shadow-execution", "solana"]
 packages = [{ include = "spl", from = "src" }]
 
+
 [tool.poetry.dependencies]
+python = "^3.11"  
 click = "^8.1.7"
-anyio = "^4.11.0"
 orjson = "^3.11.4"
 
 [tool.poetry.group.dev.dependencies]

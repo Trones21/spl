@@ -5,11 +5,11 @@ description = "SPL adapter: Drift"
 packages = [{ include = "spl_adapter_drift", from = "src" }]
 
 [tool.poetry.dependencies]
+driftpy = {path = "src/wheels/driftpy-0.8.80-py3-none-any.whl"}
 python = "^3.11"
-driftpy = "0.8.80"   # brings websockets==13 transitively
 anyio = "^4"
 orjson = "^3.9"
-# If needed, make websockets pin explicit: websockets = "13.0"
+spl-trader = {path = "../../", develop = true}
 
 [tool.poetry.plugins."spl.adapters"]
 drift = "spl_adapter_drift.adapter:DriftMarket"
